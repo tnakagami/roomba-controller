@@ -11,7 +11,7 @@ adapter = PyRoombaAdapter('/dev/ttyUSB0')
 
 @app.route('/', method=['GET'])
 def get_command():
-    return 200
+    return jsonify({'command': ''}), 200
 
 if __name__ == '__main__':
     port = os.getenv('SERVER_PORT', 10080)
