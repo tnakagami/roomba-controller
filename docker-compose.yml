@@ -15,8 +15,8 @@ services:
         image: rest_api
         restart: always
         container_name: rest_api
-        expose:
-            - 10080
+        ports:
+            - 10080:10080
         environment:
             - SERVER_PORT=10080
             - FLASK_ENV=development
