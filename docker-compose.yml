@@ -1,0 +1,27 @@
+version: '3.4'
+
+x-logging:
+    &json-logging
+    driver: json-file
+    options:
+        max-size: "10m"
+        max-file: "3"
+
+services:
+    rest_api:
+        build:
+            context: ./rest_api
+            dockerfile: Dockerfile
+        image: rest_api
+        restart: always
+        container_name: rest_api
+        ports:
+            - 10080:10080
+        environment:
+            - SERVER_PORT=10080
+            - FLASK_ENV=development
+        volumes:
+            - ./rest_api/src:/src:ro
+        logging: *json-logging
+        devices:
+            - /dev/ttyUSB0:/dev/ttyUSB0
