@@ -9,7 +9,7 @@ app = Flask('REST API')
 # create adapter
 adapter = PyRoombaAdapter('/dev/ttyUSB0')
 
-@app.route('/', method=['GET'])
+@app.route('/', methods=['GET'])
 def get_command():
     return jsonify({'command': ''}), 200
 

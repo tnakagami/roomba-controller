@@ -19,6 +19,7 @@ services:
             - 10080
         environment:
             - SERVER_PORT=10080
+            - FLASK_ENV=development
         volumes:
             - ./rest_api/src:/src:ro
         logging: *json-logging

@@ -21,10 +21,12 @@ COPY requirements.txt /requirements.txt
 RUN    apk add --no-cache --virtual .build-deps \
                           gcc musl-dev libffi-dev g++ libgcc libstdc++ \
                           libxslt-dev python3-dev libc-dev linux-headers \
-    && pip3 install -r /requirements.txt \
+    && pip3 install -r /requirements.txt --extra-index-url https://www.piwheels.org/simple \
     && apk --purge del .build-deps \
     && rm -rf /root/.cache /var/cache/apk/*
 
 EXPOSE ${SERVER_PORT}
 
-CMD ["/usr/bin/python", "-u", "${APP_ROOT_PATH}/app.py"]
+WORKDIR ${APP_ROOT_PATH}
+
+CMD ["/usr/bin/python", "-u", "app.py"]
