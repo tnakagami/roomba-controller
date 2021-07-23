@@ -17,7 +17,7 @@ commands = {
     'cleaning': lambda xs: adapter.start_cleaning(),
     'dock': lambda xs: adapter.start_seek_dock(),
     'wait': lambda xs: adapter.move(0, 0),
-    'move': lambda xs: adapter.send_drive_cmd(*xs),
+    'move': lambda xs: adapter.send_drive_cmd(*list(map(float, xs))),
 }
 
 @app.after_request
@@ -33,7 +33,7 @@ def after_request(response):
 def get_command():
     ret = {
         'commands': list(commands.keys()),
-        'args': ['move command is velocity(arg1) and yaw rate(arg2)'],
+        'args': ['move command is velocity(arg1) and radius(args2)'],
     }
 
     return jsonify(ret), 200
