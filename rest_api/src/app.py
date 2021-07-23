@@ -1,11 +1,12 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from time import sleep
-import numpy as np
 from pyroombaadapter import PyRoombaAdapter
 import os
 
 # create app
 app = Flask('REST API')
+CORS(app)
 # create adapter
 adapter = PyRoombaAdapter('/dev/ttyUSB0')
 # command list
@@ -14,10 +15,19 @@ commands = {
     'passive': lambda xs: adapter.change_mode_to_passive(),
     'safe': lambda xs: adapter.change_mode_to_safe(),
     'cleaning': lambda xs: adapter.start_cleaning(),
+    'dock': lambda xs: adapter.start_seek_dock(),
     'wait': lambda xs: adapter.move(0, 0),
-    'move': lambda xs: adapter.move(xs[0], np.rad2deg(int(xs[1]))),
+    'move': lambda xs: adapter.send_drive_cmd(*xs),
 }
 
+@app.after_request
+def after_request(response):
+    allowed_url = os.getenv('ALLOWED_URL', '')
+    response.headers.add('Access-Control-Allow-Origin', allowed_url)
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+
+    return response
 
 @app.route('/', methods=['GET'])
 def get_command():
