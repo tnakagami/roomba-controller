@@ -18,6 +18,7 @@ services:
         ports:
             - 10080:10080
         environment:
+            - DEBUG=false
             - SERVER_PORT=10080
             - FLASK_ENV=development
         volumes:
