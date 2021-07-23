@@ -16,7 +16,7 @@ services:
         restart: always
         container_name: rest_api
         ports:
-            - 10080:10080
+            - 11081:10080
         environment:
             - DEBUG=false
             - SERVER_PORT=10080
