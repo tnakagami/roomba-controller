@@ -17,7 +17,7 @@ commands = {
     'cleaning': lambda xs: adapter.start_cleaning(),
     'dock': lambda xs: adapter.start_seek_dock(),
     'wait': lambda xs: adapter.move(0, 0),
-    'move': lambda xs: adapter.send_drive_cmd(*list(map(int, xs))),
+    'move': lambda xs: adapter.send_drive_cmd(*list(map(float, xs))),
 }
 
 @app.after_request
