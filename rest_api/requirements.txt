@@ -1,4 +1,4 @@
 pyroombaadapter==0.1.5
 pyserial==3.5
 Flask==2.0.1
-numpy==1.21.0
+Flask-Cors==3.0.10
