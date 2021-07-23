@@ -21,7 +21,7 @@ commands = {
 @app.route('/', methods=['GET'])
 def get_command():
     ret = {
-        'commands': list(commands.keys())},
+        'commands': list(commands.keys()),
         'args': ['move command is velocity(arg1) and yaw rate(arg2)'],
     }
 
