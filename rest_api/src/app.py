@@ -14,6 +14,7 @@ commands = {
     'passive': lambda xs: adapter.change_mode_to_passive(),
     'safe': lambda xs: adapter.change_mode_to_safe(),
     'cleaning': lambda xs: adapter.start_cleaning(),
+    'wait': lambda xs: adapter.move(0, 0),
     'move': lambda xs: adapter.move(xs[0], np.rad2deg(int(xs[1]))),
 }
 
@@ -31,9 +32,11 @@ def get_command():
 def execute_command():
     try:
         cmd = request.json['command']
-        args = request.json['args']
+        args = request.json.get('args', [])
         # execute
         commands[cmd](args)
+        # result
+        status_code = 200
         message = 'execute {}, {}'.format(cmd, ','.join([str(value) for value in args]))
     except Exception as e:
         status_code = 500
