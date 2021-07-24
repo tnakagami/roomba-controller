@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from time import sleep
 from pyroombaadapter import PyRoombaAdapter
 import os
 
@@ -47,7 +46,7 @@ def execute_command():
         commands[cmd](args)
         # result
         status_code = 200
-        message = 'execute {}, {}'.format(cmd, ','.join([str(value) for value in args]))
+        message = 'execute {} {}'.format(cmd, ','.join([str(value) for value in args]))
     except Exception as e:
         status_code = 500
         message = e
