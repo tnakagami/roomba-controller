@@ -33,7 +33,7 @@ def after_request(response):
 def get_command():
     ret = {
         'commands': list(commands.keys()),
-        'args': ['move command is velocity(arg1) and radius(args2)'],
+        'args': ['move command requires velocity(arg1) and radius(args2)'],
     }
 
     return jsonify(ret), 200
