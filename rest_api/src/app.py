@@ -1,13 +1,47 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pyroombaadapter import PyRoombaAdapter
+from picamera import PiCamera
+from io import BytesIO
+import base64
 import os
+import time
+
+# PiCameraWrapper
+class CameraWrapper():
+    def __init__(self, resolution):
+        self.__camera = PiCamera()
+        self.__camera.resolution = resolution
+        self.__camera.rotation = 90
+        self.__stream = BytesIO()
+        self.__camera.start_preview()
+        time.sleep(2)
+
+    def finalize(self):
+        self.__camera.close()
+        self.__stream.close()
+
+    def capture(self):
+        file_format = 'jpeg'
+        # capture
+        self.__stream.seek(0)
+        self.__camera.capture(self.__stream, file_format)
+        # get binary image
+        self.__stream.seek(0)
+        binary_image = self.__stream.getvalue()
+        # convert binary image to string data encoded by base64
+        response = 'data:image/{};base64,{}'.format(file_format, base64.b64encode(binary_image).decode())
+        self.__stream.flush()
+
+        return response
 
 # create app
 app = Flask('REST API')
 CORS(app)
 # create adapter
 adapter = PyRoombaAdapter('/dev/ttyUSB0')
+# create picamera wrapper
+camera = CameraWrapper((640, 360))
 # command list
 commands = {
     'full': lambda xs: adapter.change_mode_to_full(),
@@ -53,7 +87,23 @@ def execute_command():
 
     return jsonify({'message': message}), status_code
 
+@app.route('/capture', methods=['GET'])
+def capture():
+    try:
+        status_code = 200
+        message = camera.capture()
+    except Exception as e:
+        status_code = 500
+        message = e
+
+    return jsonify({'message': message}), status_code
+
 if __name__ == '__main__':
     port = os.getenv('SERVER_PORT', 10080)
     debug = True if os.getenv('DEBUG', 'false').lower() == 'true' else False
-    app.run(host='0.0.0.0', port=port, debug=debug)
+
+    try:
+        app.run(host='0.0.0.0', port=port, debug=debug)
+    finally:
+        del adapter
+        camera.finalize()
