@@ -28,3 +28,4 @@ services:
         logging: *json-logging
         devices:
             - /dev/ttyUSB0:/dev/ttyUSB0
+            - /dev/vchiq:/dev/vchiq

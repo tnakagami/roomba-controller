@@ -2,11 +2,12 @@ FROM alpine:3.12.3
 
 ENV PYTHONUNBUFFERED=1 \
     APP_ROOT_PATH=/src \
-    SERVER_PORT=10080
+    SERVER_PORT=10080 \
+    LD_LIBRARY_PATH=/opt/vc/lib
 
 # install python
 RUN    apk --no-cache update \
-    && apk --no-cache add bash tzdata python3 raspberrypi-libs \
+    && apk --no-cache add bash tzdata python3 raspberrypi-libs tini \
     && cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime \
     && ln -sf python3 /usr/bin/python \
     && python3 -m ensurepip \
@@ -27,4 +28,5 @@ RUN    apk add --no-cache --virtual .build-deps \
 
 WORKDIR ${APP_ROOT_PATH}
 
+ENTRYPOINT ["/sbin/tini", "-e", "143", "--"]
 CMD ["python", "-u", "app.py"]
