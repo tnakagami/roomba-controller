@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 # install python
 RUN    apk --no-cache update \
-    && apk --no-cache add bash tzdata python3 \
+    && apk --no-cache add bash tzdata python3 raspberrypi-libs \
     && cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime \
     && ln -sf python3 /usr/bin/python \
     && python3 -m ensurepip \
