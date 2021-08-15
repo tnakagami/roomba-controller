@@ -5,17 +5,41 @@ from pyroombaadapter import PyRoombaAdapter
 from picamera import PiCamera
 from io import BytesIO
 import logging
+import logging.config as logconf
 import base64
 import os
 import time
 
 # setup logger
-default_handler.setLevel(logging.INFO)
-file_handler = logging.FileHandler('/var/log/access.log')
-file_handler.setLevel(logging.INFO)
-logger = logging.getLogger('werkzeug')
-logger.addHandler(default_handler)
-logger.addHandler(file_handler)
+log_configure = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+            'datefmt': '%Y/%m/%d %H:%M:%S',
+        },
+    },
+    'handlers': {
+        'timeRotate': {
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'formatter': 'default',
+            'filename': '/var/log/access.log',
+            'when': 'W2',
+            'backupCount': 3,
+        },
+        'wsgi': {
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://flask.logging.wsgi_errors_stream',
+            'formatter': 'default',
+        },
+    },
+    'root': {
+        'level': 'INFO',
+        'handlers': ['timeRotate', 'wsgi'],
+    },
+}
+logconf.dictConfig(log_configure)
 
 # PiCameraWrapper
 class CameraWrapper():
@@ -45,13 +69,13 @@ class CameraWrapper():
 
         return response
 
-# create app
-app = Flask('REST API')
-CORS(app)
+# create api
+api = Flask('Manual Roomba Controller')
+CORS(api)
 # create adapter
 adapter = PyRoombaAdapter('/dev/ttyUSB0')
-# create picamera wrapper
-camera = CameraWrapper((640, 360))
+# create picamera wrapier
+camera = CameraWrapier((640, 360))
 # command list
 commands = {
     'full': lambda xs: adapter.change_mode_to_full(),
@@ -63,7 +87,7 @@ commands = {
     'move': lambda xs: adapter.send_drive_cmd(*list(map(float, xs))),
 }
 
-@app.after_request
+@api.after_request
 def after_request(response):
     allowed_url = os.getenv('ALLOWED_URL', '')
     response.headers.add('Access-Control-Allow-Origin', allowed_url)
@@ -72,7 +96,7 @@ def after_request(response):
 
     return response
 
-@app.route('/', methods=['GET'])
+@api.route('/', methods=['GET'])
 def get_command():
     ret = {
         'commands': list(commands.keys()),
@@ -81,7 +105,7 @@ def get_command():
 
     return jsonify(ret), 200
 
-@app.route('/', methods=['POST'])
+@api.route('/', methods=['POST'])
 def execute_command():
     try:
         cmd = request.json.get('command', '')
@@ -94,13 +118,11 @@ def execute_command():
     except Exception as e:
         status_code = 500
         message = e
-        output = '        {}'.format(message)
-        logger.warn(output)
-        app.logger.warn(output)
+        api.logger.warn('        {}'.format(message))
 
     return jsonify({'message': message}), status_code
 
-@app.route('/capture', methods=['GET'])
+@api.route('/capture', methods=['GET'])
 def capture():
     try:
         status_code = 200
@@ -108,9 +130,7 @@ def capture():
     except Exception as e:
         status_code = 500
         message = e
-        output = '        {}'.format(message)
-        logger.warn(output)
-        app.logger.warn(output)
+        api.logger.warn('        {}'.format(message))
 
     return jsonify({'message': message}), status_code
 
@@ -120,7 +140,7 @@ if __name__ == '__main__':
 
     try:
         adapter.change_mode_to_safe()
-        app.run(host='0.0.0.0', port=port, debug=debug)
+        api.run(host='0.0.0.0', port=port, debug=debug)
     finally:
         del adapter
         camera.finalize()
