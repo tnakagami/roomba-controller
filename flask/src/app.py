@@ -140,6 +140,8 @@ if __name__ == '__main__':
     try:
         adapter.change_mode_to_safe()
         api.run(host='0.0.0.0', port=port, debug=debug)
+    except Exception as e:
+        api.logger.warn('[main] {}'.format(e))
     finally:
         del adapter
         camera.finalize()
