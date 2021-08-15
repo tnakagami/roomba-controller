@@ -1,5 +1,4 @@
-from flask import Flask, jsonify, request, has_request_context
-from flask.logging import default_handler
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pyroombaadapter import PyRoombaAdapter
 from picamera import PiCamera
@@ -75,7 +74,7 @@ CORS(api)
 # create adapter
 adapter = PyRoombaAdapter('/dev/ttyUSB0')
 # create picamera wrapier
-camera = CameraWrapier((640, 360))
+camera = CameraWrapper((640, 360))
 # command list
 commands = {
     'full': lambda xs: adapter.change_mode_to_full(),

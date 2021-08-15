@@ -8,13 +8,13 @@ x-logging:
         max-file: "3"
 
 services:
-    rest_api:
+    flask:
         build:
-            context: ./rest_api
+            context: ./flask
             dockerfile: Dockerfile
-        image: rest_api
+        image: flask
         restart: always
-        container_name: rest_api
+        container_name: flask
         ports:
             - 11081:10080
         env_file:
@@ -24,7 +24,7 @@ services:
             - SERVER_PORT=10080
             - FLASK_ENV=development
         volumes:
-            - ./rest_api/src:/src:ro
+            - ./flask/src:/src:ro
         logging: *json-logging
         devices:
             - /dev/ttyUSB0:/dev/ttyUSB0
