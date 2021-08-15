@@ -9,27 +9,9 @@ import base64
 import os
 import time
 
-# RequestFormatter
-class RequestFormatter(logging.Formatter):
-    def format(self, record):
-        if has_request_context():
-            record.url = request.url
-            record.remote_addr = request.remote_addr
-        else:
-            record.url = None
-            record.remote_addr = None
-
-        return super().format(record)
-
 # setup logger
-formatter = RequestFormatter(
-    '[%(asctime)s] %(remote_addr)s requested %(url)s '
-    '%(levelname)s in %(module)s: %(message)s'
-)
-#default_handler.setFormatter(formatter)
 default_handler.setLevel(logging.INFO)
 file_handler = logging.FileHandler('/var/log/access.log')
-#file_handler.setFormatter(formatter)
 file_handler.setLevel(logging.INFO)
 logger = logging.getLogger('werkzeug')
 logger.addHandler(default_handler)
@@ -109,9 +91,13 @@ def execute_command():
         # result
         status_code = 200
         message = 'execute {} {}'.format(cmd, ','.join([str(value) for value in args]))
+        logger.info(message)
+        app.logger.info(message)
     except Exception as e:
         status_code = 500
         message = e
+        logger.warn(message)
+        app.logger.warn(message)
 
     return jsonify({'message': message}), status_code
 
