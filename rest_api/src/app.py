@@ -1,11 +1,39 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, has_request_context
+from flask.logging import default_handler
 from flask_cors import CORS
 from pyroombaadapter import PyRoombaAdapter
 from picamera import PiCamera
 from io import BytesIO
+import logging
 import base64
 import os
 import time
+
+# RequestFormatter
+class RequestFormatter(logging.Formatter):
+    def format(self, record):
+        if has_request_context():
+            record.url = request.url
+            record.remote_addr = request.remote_addr
+        else:
+            record.url = None
+            record.remote_addr = None
+
+        return super().format(record)
+
+# setup logger
+formatter = RequestFormatter(
+    '[%(asctime)s] %(remote_addr)s requested %(url)s '
+    '%(levelname)s in %(module)s: %(message)s'
+)
+#default_handler.setFormatter(formatter)
+default_handler.setLevel(logging.INFO)
+file_handler = logging.FileHandler('/var/log/access.log')
+#file_handler.setFormatter(formatter)
+file_handler.setLevel(logging.INFO)
+logger = logging.getLogger('werkzeug')
+logger.addHandler(default_handler)
+logger.addHandler(file_handler)
 
 # PiCameraWrapper
 class CameraWrapper():
