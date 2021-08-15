@@ -91,13 +91,12 @@ def execute_command():
         # result
         status_code = 200
         message = 'execute {} {}'.format(cmd, ','.join([str(value) for value in args]))
-        logger.info(message)
-        app.logger.info(message)
     except Exception as e:
         status_code = 500
         message = e
-        logger.warn(message)
-        app.logger.warn(message)
+        output = '        {}'.format(message)
+        logger.warn(output)
+        app.logger.warn(output)
 
     return jsonify({'message': message}), status_code
 
@@ -109,6 +108,9 @@ def capture():
     except Exception as e:
         status_code = 500
         message = e
+        output = '        {}'.format(message)
+        logger.warn(output)
+        app.logger.warn(output)
 
     return jsonify({'message': message}), status_code
 
