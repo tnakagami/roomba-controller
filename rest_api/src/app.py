@@ -74,7 +74,7 @@ def get_command():
 @app.route('/', methods=['POST'])
 def execute_command():
     try:
-        cmd = request.json['command']
+        cmd = request.json.get('command', '')
         args = request.json.get('args', [])
         # execute
         commands[cmd](args)
@@ -103,6 +103,7 @@ if __name__ == '__main__':
     debug = True if os.getenv('DEBUG', 'false').lower() == 'true' else False
 
     try:
+        adapter.change_mode_to_safe()
         app.run(host='0.0.0.0', port=port, debug=debug)
     finally:
         del adapter
