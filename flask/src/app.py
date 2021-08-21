@@ -138,7 +138,7 @@ if __name__ == '__main__':
     debug = True if os.getenv('DEBUG', 'false').lower() == 'true' else False
 
     try:
-        adapter.change_mode_to_safe()
+        adapter.change_mode_to_passive()
         api.run(host='0.0.0.0', port=port, debug=debug)
     except Exception as e:
         api.logger.warn('[main] {}'.format(e))
