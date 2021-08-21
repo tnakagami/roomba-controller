@@ -77,6 +77,7 @@ adapter = PyRoombaAdapter('/dev/ttyUSB0')
 camera = CameraWrapper((640, 360))
 # command list
 commands = {
+    'off': lambda xs: adapter.turn_off_power(),
     'full': lambda xs: adapter.change_mode_to_full(),
     'passive': lambda xs: adapter.change_mode_to_passive(),
     'safe': lambda xs: adapter.change_mode_to_safe(),
@@ -114,6 +115,7 @@ def execute_command():
         # result
         status_code = 200
         message = 'execute {} {}'.format(cmd, ','.join([str(value) for value in args]))
+        api.logger.info(message)
     except Exception as e:
         status_code = 500
         message = e
@@ -126,6 +128,7 @@ def capture():
     try:
         status_code = 200
         message = camera.capture()
+        api.logger.info('Captured')
     except Exception as e:
         status_code = 500
         message = e
@@ -138,7 +141,7 @@ if __name__ == '__main__':
     debug = True if os.getenv('DEBUG', 'false').lower() == 'true' else False
 
     try:
-        adapter.change_mode_to_safe()
+        adapter.turn_off_power()
         api.run(host='0.0.0.0', port=port, debug=debug)
     except Exception as e:
         api.logger.warn('[main] {}'.format(e))
