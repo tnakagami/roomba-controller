@@ -26,6 +26,9 @@ RUN    apk add --no-cache --virtual .build-deps \
     && apk --purge del .build-deps \
     && rm -rf /root/.cache /var/cache/apk/*
 
+# add prompt file
+COPY color_prompt.sh /etc/profile.d/color_prompt.sh
+
 WORKDIR ${APP_ROOT_PATH}
 
 ENTRYPOINT ["/sbin/tini", "-e", "143", "--"]
