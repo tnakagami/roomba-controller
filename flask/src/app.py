@@ -118,7 +118,7 @@ def execute_command():
         api.logger.info(message)
     except Exception as e:
         status_code = 500
-        message = e
+        message = str(e)
         api.logger.warning('        {}'.format(message))
 
     return jsonify({'message': message}), status_code
@@ -131,7 +131,7 @@ def capture():
         api.logger.info('Captured')
     except Exception as e:
         status_code = 500
-        message = e
+        message = str(e)
         api.logger.warning('        {}'.format(message))
 
     return jsonify({'message': message}), status_code
