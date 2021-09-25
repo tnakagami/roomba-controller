@@ -119,7 +119,7 @@ def execute_command():
     except Exception as e:
         status_code = 500
         message = e
-        api.logger.warn('        {}'.format(message))
+        api.logger.warning('        {}'.format(message))
 
     return jsonify({'message': message}), status_code
 
@@ -132,7 +132,7 @@ def capture():
     except Exception as e:
         status_code = 500
         message = e
-        api.logger.warn('        {}'.format(message))
+        api.logger.warning('        {}'.format(message))
 
     return jsonify({'message': message}), status_code
 
@@ -144,7 +144,7 @@ if __name__ == '__main__':
         adapter.change_mode_to_passive()
         api.run(host='0.0.0.0', port=port, debug=debug)
     except Exception as e:
-        api.logger.warn('[main] {}'.format(e))
+        api.logger.warning('[main] {}'.format(e))
     finally:
         del adapter
         camera.finalize()

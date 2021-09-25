@@ -32,5 +32,4 @@ RUN echo "source /etc/profile" >> /root/.bashrc
 
 WORKDIR ${APP_ROOT_PATH}
 
-ENTRYPOINT ["/sbin/tini", "-e", "143", "--"]
-CMD ["python", "-u", "app.py"]
+CMD ["/usr/bin/python", "app.py"]
