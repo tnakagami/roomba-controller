@@ -9,6 +9,8 @@ import base64
 import os
 import time
 
+enable_camera = False
+
 # setup logger
 log_configure = {
     'version': 1,
@@ -74,7 +76,8 @@ CORS(api)
 # create adapter
 adapter = PyRoombaAdapter('/dev/ttyUSB0')
 # create picamera wrapier
-camera = CameraWrapper((640, 360))
+if enable_camera:
+    camera = CameraWrapper((640, 360))
 # command list
 commands = {
     'off': lambda xs: adapter.turn_off_power(),
@@ -125,13 +128,18 @@ def execute_command():
 
 @api.route('/capture', methods=['GET'])
 def capture():
-    try:
-        status_code = 200
-        message = camera.capture()
-        api.logger.info('Captured')
-    except Exception as e:
-        status_code = 500
-        message = str(e)
+    if enable_camera:
+        try:
+            status_code = 200
+            message = camera.capture()
+            api.logger.info('Captured')
+        except Exception as e:
+            status_code = 500
+            message = str(e)
+            api.logger.warning('        {}'.format(message))
+    else:
+        status_code = 403
+        message = 'Forbidden'
         api.logger.warning('        {}'.format(message))
 
     return jsonify({'message': message}), status_code
@@ -147,4 +155,6 @@ if __name__ == '__main__':
         api.logger.warning('[main] {}'.format(e))
     finally:
         del adapter
-        camera.finalize()
+
+        if enable_camera:
+            camera.finalize()
